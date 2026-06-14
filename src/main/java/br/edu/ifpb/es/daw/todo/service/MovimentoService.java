@@ -1,5 +1,7 @@
 package br.edu.ifpb.es.daw.todo.service;
 
+import br.edu.ifpb.es.daw.todo.exception.EstadoInvalidoException;
+import br.edu.ifpb.es.daw.todo.exception.PokemonException;
 import br.edu.ifpb.es.daw.todo.mapper.MovimentoMapper;
 import br.edu.ifpb.es.daw.todo.model.Movimento;
 import br.edu.ifpb.es.daw.todo.repository.MovimentoRepository;
@@ -25,8 +27,34 @@ public class MovimentoService {
         this.movimentoMapper = movimentoMapper;
     }
 
+    private void validarMovimento(Long id, MovimentoSalvarRequestDTO dto) {
+
+        boolean existe;
+
+        if (id == null) {
+            existe = repository.existsByNomeDoPoderIgnoreCase(dto.nomeDoPoder());
+        } else {
+            existe = repository.existsByIdNotAndNomeDoPoderIgnoreCase(
+                    id,
+                    dto.nomeDoPoder()
+            );
+        }
+
+        if (existe) {
+            throw new EstadoInvalidoException(
+                    String.format(
+                            "Já existe um movimento com o nome '%s'.",
+                            dto.nomeDoPoder()
+                    )
+            );
+        }
+    }
+
     @Transactional
     public MovimentoResponseDTO criar(MovimentoSalvarRequestDTO dto) {
+
+        validarMovimento(null ,dto);
+
         Movimento movNovo = movimentoMapper.from(dto);
         Movimento movCriado = repository.save(movNovo);
         return movimentoMapper.from(movCriado);
@@ -42,7 +70,7 @@ public class MovimentoService {
 
     private Movimento ensureExists(Long id) {
         Optional<Movimento> movimentoopt = repository.findById(id);
-        Movimento mov = movimentoopt.orElseThrow(() -> new IllegalArgumentException(String.format("Entidade 'Movimento' de id '%s' não foi encontrada!", id)));
+        Movimento mov = movimentoopt.orElseThrow(() -> new PokemonException(String.format("Entidade 'Movimento' de id '%s' não foi encontrada!", id)));
         return mov;
     }
 
@@ -53,6 +81,8 @@ public class MovimentoService {
 
     @Transactional
     public MovimentoResponseDTO atualizar(Long id, MovimentoSalvarRequestDTO dto) {
+        validarMovimento(id, dto);
+
         Movimento movExistente = ensureExists(id);
         movExistente.setNomeDoPoder(dto.nomeDoPoder());
         movExistente.setPoder(dto.poder());

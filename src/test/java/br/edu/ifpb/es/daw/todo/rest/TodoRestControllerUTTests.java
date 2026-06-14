@@ -1,9 +1,5 @@
 package br.edu.ifpb.es.daw.todo.rest;
 
-import br.edu.ifpb.es.daw.todo.rest.dto.TodoBuscarDTO;
-import br.edu.ifpb.es.daw.todo.rest.dto.TodoResponseDTO;
-import br.edu.ifpb.es.daw.todo.rest.dto.TodoSalvarRequestDTO;
-import br.edu.ifpb.es.daw.todo.service.TodoService;
 import tools.jackson.databind.ObjectMapper;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Test;
