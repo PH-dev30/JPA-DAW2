@@ -37,7 +37,7 @@ public class Ginasio {
     @Column(name = "Especialidade", nullable = false)
     private Tipos tipo;
 
-    ToOne
+    @OneToOne
     @JoinColumn(name = "time_id", nullable = false)
     private Time time;
 
