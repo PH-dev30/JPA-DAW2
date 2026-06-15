@@ -5,11 +5,14 @@ import br.edu.ifpb.es.daw.todo.exception.PokemonException;
 import br.edu.ifpb.es.daw.todo.mapper.MovimentoMapper;
 import br.edu.ifpb.es.daw.todo.model.Movimento;
 import br.edu.ifpb.es.daw.todo.repository.MovimentoRepository;
+import br.edu.ifpb.es.daw.todo.rest.dto.MovimentoBuscarDTO;
 import br.edu.ifpb.es.daw.todo.rest.dto.MovimentoResponseDTO;
 import br.edu.ifpb.es.daw.todo.rest.dto.MovimentoSalvarRequestDTO;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,7 +56,7 @@ public class MovimentoService {
     @Transactional
     public MovimentoResponseDTO criar(MovimentoSalvarRequestDTO dto) {
 
-        validarMovimento(null ,dto);
+        validarMovimento(null, dto);
 
         Movimento movNovo = movimentoMapper.from(dto);
         Movimento movCriado = repository.save(movNovo);
@@ -90,6 +93,29 @@ public class MovimentoService {
         movExistente.setTipoDivisao(dto.tipoDivisao());
         Movimento movAtualizado = repository.save(movExistente);
         return movimentoMapper.from(movAtualizado);
+    }
+
+    public Page<MovimentoResponseDTO> buscar(MovimentoBuscarDTO dto) {
+
+        String nome = dto.nomeDoPoder();
+
+        if (nome == null) {
+            nome = "";
+        }
+
+        Page<Movimento> page = repository.buscarPor(
+                nome,
+                dto.poderMin(),
+                dto.poderMax(),
+                dto.tipo(),
+                dto.tipoDivisao(),
+                PageRequest.of(
+                        dto.numeroPagina() == null ? 0 : dto.numeroPagina(),
+                        dto.tamanhoPagina() == null ? 10 : dto.tamanhoPagina()
+                )
+        );
+
+        return page.map(movimentoMapper::from);
     }
 
     @Transactional

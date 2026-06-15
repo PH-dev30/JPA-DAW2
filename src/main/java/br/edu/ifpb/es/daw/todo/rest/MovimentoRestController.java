@@ -4,6 +4,7 @@ import br.edu.ifpb.es.daw.todo.rest.dto.*;
 import br.edu.ifpb.es.daw.todo.service.MovimentoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,15 @@ public class MovimentoRestController implements MovimentoRestControllerApi{
     @PatchMapping("/{id}")
     public ResponseEntity<MovimentoResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid MovimentoSalvarRequestDTO dto) {
         MovimentoResponseDTO resultado = movimentoService.atualizar(id, dto);
+        return new ResponseEntity<>(resultado, HttpStatus.OK);
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<MovimentoResponseDTO>> buscar(MovimentoBuscarDTO dto) {
+
+        Page<MovimentoResponseDTO> resultado =
+                movimentoService.buscar(dto);
+
         return new ResponseEntity<>(resultado, HttpStatus.OK);
     }
 
