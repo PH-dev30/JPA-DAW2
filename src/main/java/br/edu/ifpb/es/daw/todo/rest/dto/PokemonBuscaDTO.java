@@ -8,5 +8,8 @@ public record PokemonBuscaDTO(
         String nome,
         Tipos tipo1,
         Raridades raridade,
-        Regioes regioes) {
+        Regioes regioes,
+        Integer numeroPagina,
+        Integer tamanhoPagina) {
+
 }

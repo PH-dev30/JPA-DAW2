@@ -7,10 +7,13 @@ import br.edu.ifpb.es.daw.todo.model.Movimento;
 import br.edu.ifpb.es.daw.todo.model.Pokemon;
 import br.edu.ifpb.es.daw.todo.repository.MovimentoRepository;
 import br.edu.ifpb.es.daw.todo.repository.PokemonRepository;
+import br.edu.ifpb.es.daw.todo.rest.dto.PokemonBuscaDTO;
 import br.edu.ifpb.es.daw.todo.rest.dto.PokemonResponseDTO;
 import br.edu.ifpb.es.daw.todo.rest.dto.PokemonSalvarRequestDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -26,9 +29,7 @@ public class PokemonService {
     private final MovimentoRepository movimentoRepository;
 
     @Autowired
-    public PokemonService(PokemonRepository repository,
-                          PokemonMapper pokemonMapper,
-                          MovimentoRepository movimentoRepository) {
+    public PokemonService(PokemonRepository repository, PokemonMapper pokemonMapper, MovimentoRepository movimentoRepository) {
         this.repository = repository;
         this.pokemonMapper = pokemonMapper;
         this.movimentoRepository = movimentoRepository;
@@ -38,28 +39,20 @@ public class PokemonService {
 
         Set<Long> movimentos = new HashSet<>();
 
-        List<Long> ids = List.of(
-                dto.movimento1Id(),
-                dto.movimento2Id(),
-                dto.movimento3Id(),
-                dto.movimento4Id()
-        );
+        List<Long> ids = List.of(dto.movimento1Id(), dto.movimento2Id(), dto.movimento3Id(), dto.movimento4Id());
 
         for (Long id : ids) {
             if (id == null) continue;
 
             if (!movimentos.add(id)) {
-                throw new EstadoInvalidoException(
-                        "Um Pokémon não pode possuir movimentos repetidos.");
+                throw new EstadoInvalidoException("Um Pokémon não pode possuir movimentos repetidos.");
             }
         }
     }
 
     private Movimento findMovimento(Long id) {
         if (id == null) return null;
-        return movimentoRepository.findById(id)
-                .orElseThrow(() -> new PokemonException(
-                        String.format("Movimento de id '%s' não encontrado!", id)));
+        return movimentoRepository.findById(id).orElseThrow(() -> new PokemonException(String.format("Movimento de id '%s' não encontrado!", id)));
     }
 
     @Transactional
@@ -78,16 +71,12 @@ public class PokemonService {
     }
 
     public List<PokemonResponseDTO> recuperarTodos() {
-        return repository.findAll()
-                .stream()
-                .map(pokemonMapper::from)
-                .toList();
+        return repository.findAll().stream().map(pokemonMapper::from).toList();
     }
 
     private Pokemon ensureExists(Long id) {
         Optional<Pokemon> pokemonOpt = repository.findById(id);
-        return pokemonOpt.orElseThrow(() -> new PokemonException(
-                String.format("Entidade 'Pokemon' de id '%s' não foi encontrada!", id)));
+        return pokemonOpt.orElseThrow(() -> new PokemonException(String.format("Entidade 'Pokemon' de id '%s' não foi encontrada!", id)));
     }
 
     public PokemonResponseDTO buscarPor(Long id) {
@@ -112,6 +101,26 @@ public class PokemonService {
 
         Pokemon pokemonAtualizado = repository.save(pokemonExistente);
         return pokemonMapper.from(pokemonAtualizado);
+    }
+
+    public Page<PokemonResponseDTO> buscar(PokemonBuscaDTO dto) {
+
+        String nome = dto.nome();
+
+        if (nome == null) {
+            nome = "";
+        }
+
+        Page<Pokemon> page = repository.buscarPor(nome, dto.tipo1(), dto.raridade(), dto.regioes(), PageRequest.of(dto.numeroPagina() == null ? 0 : dto.numeroPagina(), dto.tamanhoPagina() == null ? 10 : dto.tamanhoPagina()));
+
+        return page.map(pokemonMapper::from);
+    }
+
+    public List<PokemonResponseDTO> buscarPorMovimento(Long movimentoId) {
+
+        movimentoRepository.findById(movimentoId).orElseThrow(() -> new PokemonException(String.format("Movimento de id '%s' não encontrado!", movimentoId)));
+
+        return repository.findByMovimentoId(movimentoId).stream().map(pokemonMapper::from).toList();
     }
 
     @Transactional
