@@ -17,7 +17,7 @@ public class OpenAPIConfiguration {
     OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Pokemon API")
+                        .title("Sistema de Batalha Pokemon API")
                         .description("API REST do projeto Sistema de Batalha Pokemon")
                         .version("1.0.0")
                         .contact(new Contact()
