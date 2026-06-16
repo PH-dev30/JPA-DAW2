@@ -44,7 +44,7 @@ public class BatalhaService {
     }
 
     private Time findTime(Long id) {
-        if (id == null) return null; // timeVencedor é opcional (empate)
+        if (id == null) return null;
         return timeRepository.findById(id)
                 .orElseThrow(() -> new PokemonException("Time não encontrado!"));
     }
