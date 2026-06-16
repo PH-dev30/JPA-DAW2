@@ -18,7 +18,7 @@ public class OpenAPIConfiguration {
         return new OpenAPI()
                 .info(new Info()
                         .title("Pokemon API")
-                        .description("API REST do projeto Pokémon JPA")
+                        .description("API REST do projeto Sistema de Batalha Pokemon")
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Pedro")
