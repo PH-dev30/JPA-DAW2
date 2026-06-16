@@ -57,4 +57,14 @@ public class BatalhaRestController implements BatalhaRestControllerApi{
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/simular")
+    public ResponseEntity<BatalhaResponseDTO> simular(
+            @PathVariable Long id) {
+
+        BatalhaResponseDTO resultado =
+                batalhaService.simular(id);
+
+        return ResponseEntity.ok(resultado);
+    }
+
 }

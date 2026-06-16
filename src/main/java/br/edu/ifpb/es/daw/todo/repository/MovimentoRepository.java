@@ -18,14 +18,13 @@ public interface MovimentoRepository extends JpaRepository<Movimento, Long> {
     boolean existsByIdNotAndNomeDoPoderIgnoreCase(Long id, String nomeDoPoder);
 
     @Query("""
-   SELECT m FROM Movimento m
-   WHERE m.nomeDoPoder LIKE CONCAT('%', :nomeDoPoder, '%')
-   AND (:poderMin IS NULL OR m.poder >= :poderMin)
-   AND (:poderMax IS NULL OR m.poder <= :poderMax)
-   AND (:tipo IS NULL OR m.tipo = :tipo)
-   AND (:tipoDivisao IS NULL OR m.tipoDivisao = :tipoDivisao)
-   """)
-
+            SELECT m FROM Movimento m
+            WHERE m.nomeDoPoder LIKE CONCAT('%', :nomeDoPoder, '%')
+            AND (:poderMin IS NULL OR m.poder >= :poderMin)
+            AND (:poderMax IS NULL OR m.poder <= :poderMax)
+            AND (:tipo IS NULL OR m.tipo = :tipo)
+            AND (:tipoDivisao IS NULL OR m.tipoDivisao = :tipoDivisao)
+            """)
     Page<Movimento> buscarPor(
             @Param("nomeDoPoder") String nomeDoPoder,
             @Param("poderMin") Integer poderMin,

@@ -90,4 +90,19 @@ public interface BatalhaRestControllerApi {
     ResponseEntity<Void> remover(
             @Parameter(description = "Id da batalha.")
             Long id);
+
+    @Operation(
+            summary = "Simular batalha",
+            description = "Calcula automaticamente o vencedor da batalha com base na soma dos poderes dos movimentos dos pokémons dos dois times."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Batalha simulada com sucesso."),
+            @ApiResponse(responseCode = "400", description = "Batalha não encontrada."),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado.")
+    })
+    ResponseEntity<BatalhaResponseDTO> simular(
+            @Parameter(description = "Id da batalha")
+            Long id
+    );
+
 }

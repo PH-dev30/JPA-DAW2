@@ -13,6 +13,8 @@ public record BatalhaResponseDTO(
         Locais local,
         Resultado resultado,
         Long treinador1Id,
+        Long time1Id,
         Long treinador2Id,
+        Long time2Id,
         Long timeVencedorId) {
 }

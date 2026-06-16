@@ -10,14 +10,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BatalhaMapper {
-    public Batalha from(BatalhaSalvarRequestDTO from, Treinador t1, Treinador t2, Time timeVencedor) {
+    public Batalha from(BatalhaSalvarRequestDTO from, Treinador t1, Treinador t2,Time time1, Time time2, Time timeVencedor) {
         return Batalha.builder()
                 .hora(from.hora())
                 .cidade(from.cidade())
                 .local(from.local())
                 .resultado(from.resultado())
                 .treinador1(t1)
+                .time1(time1)
                 .treinador2(t2)
+                .time2(time2)
                 .timeVencedor(timeVencedor)
                 .build();
     }
@@ -29,9 +31,26 @@ public class BatalhaMapper {
                 from.getCidade(),
                 from.getLocal(),
                 from.getResultado(),
-                from.getTreinador1() != null ? from.getTreinador1().getId() : null,
-                from.getTreinador2() != null ? from.getTreinador2().getId() : null,
-                from.getTimeVencedor() != null ? from.getTimeVencedor().getId() : null
+
+                from.getTreinador1() != null
+                        ? from.getTreinador1().getId()
+                        : null,
+
+                from.getTreinador2() != null
+                        ? from.getTreinador2().getId()
+                        : null,
+
+                from.getTime1() != null
+                        ? from.getTime1().getId()
+                        : null,
+
+                from.getTime2() != null
+                        ? from.getTime2().getId()
+                        : null,
+
+                from.getTimeVencedor() != null
+                        ? from.getTimeVencedor().getId()
+                        : null
         );
     }
 }

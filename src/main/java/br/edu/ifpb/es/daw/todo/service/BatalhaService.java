@@ -1,12 +1,15 @@
 
 package br.edu.ifpb.es.daw.todo.service;
 
+import br.edu.ifpb.es.daw.todo.exception.EstadoInvalidoException;
 import br.edu.ifpb.es.daw.todo.exception.PokemonException;
 import br.edu.ifpb.es.daw.todo.mapper.BatalhaMapper;
 import br.edu.ifpb.es.daw.todo.model.Batalha;
 import br.edu.ifpb.es.daw.todo.model.Time;
 import br.edu.ifpb.es.daw.todo.model.Treinador;
+import br.edu.ifpb.es.daw.todo.model.enums.Resultado;
 import br.edu.ifpb.es.daw.todo.repository.BatalhaRepository;
+import br.edu.ifpb.es.daw.todo.repository.SelecaoRepository;
 import br.edu.ifpb.es.daw.todo.repository.TimeRepository;
 import br.edu.ifpb.es.daw.todo.repository.TreinadorRepository;
 import br.edu.ifpb.es.daw.todo.rest.dto.BatalhaResponseDTO;
@@ -23,14 +26,16 @@ public class BatalhaService {
     private final BatalhaMapper batalhaMapper;
     private final TreinadorRepository treinadorRepository;
     private final TimeRepository timeRepository;
+    private final SelecaoRepository selecaoRepository;
 
     @Autowired
     public BatalhaService(BatalhaRepository repository, BatalhaMapper batalhaMapper,
-                          TreinadorRepository treinadorRepository, TimeRepository timeRepository) {
+                          TreinadorRepository treinadorRepository, TimeRepository timeRepository, SelecaoRepository selecaoRepository) {
         this.repository = repository;
         this.batalhaMapper = batalhaMapper;
         this.treinadorRepository = treinadorRepository;
         this.timeRepository = timeRepository;
+        this.selecaoRepository = selecaoRepository;
     }
 
     private Treinador findTreinador(Long id) {
@@ -48,9 +53,19 @@ public class BatalhaService {
     public BatalhaResponseDTO criar(BatalhaSalvarRequestDTO dto) {
         Treinador t1 = findTreinador(dto.treinador1Id());
         Treinador t2 = findTreinador(dto.treinador2Id());
-        Time timeVencedor = findTime(dto.timeVencedorId());
-        Batalha batalhaNova = batalhaMapper.from(dto, t1, t2, timeVencedor);
+        Time time1 = findTime(dto.time1Id());
+        Time time2 = findTime(dto.time2Id());
+
+        Time timeVencedor = dto.timeVencedorId() != null
+                ? findTime(dto.timeVencedorId())
+                : null;
+
+        Batalha batalhaNova = batalhaMapper.from(
+                dto, t1, t2, time1, time2, timeVencedor
+        );
+
         Batalha batalhaCriada = repository.save(batalhaNova);
+
         return batalhaMapper.from(batalhaCriada);
     }
 
@@ -83,5 +98,45 @@ public class BatalhaService {
     @Transactional
     public void remover(Long id) {
         repository.findById(id).ifPresent(repository::delete);
+    }
+
+    public void calcularResultado(Batalha batalha) {
+
+        Integer poderTime1 =
+                selecaoRepository.calcularPoderTotalTime(
+                        batalha.getTime1().getId());
+
+        Integer poderTime2 =
+                selecaoRepository.calcularPoderTotalTime(
+                        batalha.getTime2().getId());
+
+        if (poderTime1 > poderTime2) {
+
+            batalha.setTimeVencedor(batalha.getTime1());
+            batalha.setResultado(Resultado.VITORIA_TIME1);
+
+        } else if (poderTime2 > poderTime1) {
+
+            batalha.setTimeVencedor(batalha.getTime2());
+            batalha.setResultado(Resultado.VITORIA_TIME2);
+
+        } else {
+
+            batalha.setTimeVencedor(null);
+            batalha.setResultado(Resultado.EMPATE);
+        }
+
+        repository.save(batalha);
+    }
+
+    public BatalhaResponseDTO simular(Long batalhaId) {
+
+        Batalha batalha = repository.findById(batalhaId)
+                .orElseThrow(() -> new EstadoInvalidoException(
+                        String.format("Batalha de id '%s' não encontrada!", batalhaId)));
+
+        calcularResultado(batalha);
+
+        return batalhaMapper.from(batalha);
     }
 }

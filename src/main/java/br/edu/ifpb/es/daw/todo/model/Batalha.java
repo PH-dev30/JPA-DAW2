@@ -36,7 +36,6 @@ public class Batalha {
     private Locais local;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "resultado", nullable = false)
     private Resultado resultado;
 
     @ManyToOne

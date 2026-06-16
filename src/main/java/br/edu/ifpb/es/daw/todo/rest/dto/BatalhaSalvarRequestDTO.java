@@ -18,14 +18,19 @@ public record BatalhaSalvarRequestDTO(
         @NotNull(message = "O local é obrigatório")
         Locais local,
 
-        @NotNull(message = "O resultado é obrigatório")
         Resultado resultado,
 
         @NotNull(message = "O treinador 1 é obrigatório")
         Long treinador1Id,
 
+        @NotNull(message = "O time 1 é obrigatorio")
+        Long time1Id,
+
         @NotNull(message = "O treinador 2 é obrigatório")
         Long treinador2Id,
+
+        @NotNull(message = "O time 2 é obrigatorio")
+        Long time2Id,
 
         @NotNull(message = "O time vencedor é obrigatório")
         Long timeVencedorId
