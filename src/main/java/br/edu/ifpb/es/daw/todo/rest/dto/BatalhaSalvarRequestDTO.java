@@ -32,7 +32,6 @@ public record BatalhaSalvarRequestDTO(
         @NotNull(message = "O time 2 é obrigatorio")
         Long time2Id,
 
-        @NotNull(message = "O time vencedor é obrigatório")
         Long timeVencedorId
 ) {
 
