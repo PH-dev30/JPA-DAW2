@@ -1,5 +1,6 @@
 package br.edu.ifpb.es.daw.todo.rest;
 
+import br.edu.ifpb.es.daw.todo.rest.dto.MovimentoBuscarDTO;
 import br.edu.ifpb.es.daw.todo.rest.dto.MovimentoResponseDTO;
 import br.edu.ifpb.es.daw.todo.rest.dto.MovimentoSalvarRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,4 +82,31 @@ public interface MovimentoRestControllerApi {
                             schema = @Schema(implementation = ProblemDetail.class)))
     })
     ResponseEntity<Void> remover(@Parameter(description = "Id do movimento.") Long id);
+
+    @Operation(
+            summary = "Buscar movimentos com filtros e paginação.",
+            description = """
+                Permite buscar movimentos utilizando filtros opcionais:
+                - nomeDoPoder
+                - poderMin
+                - poderMax
+                - tipo
+                - tipoDivisao
+                
+                Os resultados são retornados de forma paginada através dos
+                parâmetros numeroPagina e tamanhoPagina.
+                """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso."),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado.",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ProblemDetail.class)))
+    })
+    ResponseEntity<?> buscar(MovimentoBuscarDTO dto);
+
+
 }

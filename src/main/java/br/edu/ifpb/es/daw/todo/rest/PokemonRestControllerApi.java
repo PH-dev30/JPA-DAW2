@@ -1,5 +1,6 @@
 package br.edu.ifpb.es.daw.todo.rest;
 
+import br.edu.ifpb.es.daw.todo.rest.dto.PokemonBuscaDTO;
 import br.edu.ifpb.es.daw.todo.rest.dto.PokemonResponseDTO;
 import br.edu.ifpb.es.daw.todo.rest.dto.PokemonSalvarRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -64,4 +66,27 @@ public interface PokemonRestControllerApi {
     ResponseEntity<Void> remover(
             @Parameter(description = "Id do pokémon.")
             Long id);
+
+    @Operation(
+            summary = "Buscar pokémons com filtros",
+            description = "Permite filtrar pokémons por nome, tipo primário, raridade e região."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sucesso."),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado.")
+    })
+    ResponseEntity<Page<PokemonResponseDTO>> buscar(PokemonBuscaDTO dto);
+
+    @Operation(
+            summary = "Buscar pokémons por movimento",
+            description = "Retorna todos os pokémons que possuem o movimento informado em qualquer um dos quatro slots."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sucesso."),
+            @ApiResponse(responseCode = "400", description = "Movimento não encontrado."),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado.")
+    })
+    ResponseEntity<List<PokemonResponseDTO>> buscarPorMovimento(
+            @Parameter(description = "Id do movimento.")
+            Long movimentoId);
 }
